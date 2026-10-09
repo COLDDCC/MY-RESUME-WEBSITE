@@ -1,0 +1,32 @@
+name: Capture real website screenshots
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'scripts/capture-sites.mjs'
+      - '.github/workflows/capture-sites.yml'
+permissions:
+  contents: write
+jobs:
+  capture:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --no-save playwright
+      - run: npx playwright install --with-deps chromium
+      - name: Screenshot four live sites
+        run: node scripts/capture-sites.mjs
+      - name: Commit screenshots
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/screenshots/*.webp || true
+          if ! git diff --cached --quiet; then
+            git commit -m "Add real website screenshots"
+            git push
+          fi
