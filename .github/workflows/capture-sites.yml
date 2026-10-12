@@ -16,9 +16,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - run: npm install --no-save playwright
+      - run: npm install --no-save playwright sharp
       - run: npx playwright install --with-deps chromium
-      - name: Screenshot four live sites
+      - name: Screenshot live sites
         run: node scripts/capture-sites.mjs
       - name: Commit screenshots
         if: always()
